@@ -1,6 +1,7 @@
 const Room = require('./Room');
 const ConnectionError = require('./ConnectionError');
 const logger = require('./logger');
+const persistence = require('./persistence');
 
 /** Delay between janitor runs. */
 const JANITOR_INTERVAL = 1000 * 60;
@@ -31,6 +32,17 @@ class RoomList {
     this.janitor = this.janitor.bind(this);
     /** @private */
     this.janitorInterval = null;
+    this.saveInterval = null;
+        // ADD THIS: restore rooms from disk on startup
+    const saved = persistence.load();
+    for (const [roomId, variables] of Object.entries(saved)) {
+      const room = new Room(roomId);
+      for (const [name, value] of Object.entries(variables)) {
+        room.create(name, value);
+      }
+      this.rooms.set(roomId, room);
+      logger.info('Restored room from disk: ' + roomId);
+    }
   }
 
   /**
@@ -121,7 +133,11 @@ class RoomList {
    * Begin the janitor timer.
    */
   startJanitor() {
-    this.janitorInterval = setInterval(this.janitor, JANITOR_INTERVAL)
+    this.janitorInterval = setInterval(this.janitor, JANITOR_INTERVAL);
+    // ADD THIS: periodic save
+    this.saveInterval = setInterval(() => {
+      persistence.save(this.rooms);
+    }, persistence.SAVE_INTERVAL);
   }
 
   /**
@@ -132,6 +148,11 @@ class RoomList {
     if (this.janitorInterval) {
       clearInterval(this.janitorInterval);
     }
+    // ADD THIS: save on shutdown and clear interval
+    if (this.saveInterval) {
+      clearInterval(this.saveInterval);
+    }
+    persistence.save(this.rooms);
   }
 }
 

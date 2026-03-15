@@ -8,6 +8,7 @@ const validators = require('./validators');
 const logger = require('./logger');
 const naughty = require('./naughty');
 const config = require('./config');
+const persistence = require('./persistence');
 
 const wss = new WebSocket.Server({
   noServer: true, // we setup the server on our own
@@ -173,7 +174,6 @@ wss.on('connection', (ws, req) => {
     if (!client.room) throw new ConnectionError(ConnectionError.Error, 'No room setup yet');
 
     if (!validators.isValidVariableValue(value)) {
-      // silently ignore
       logger.debug('Ignoring invalid value: ' + value);
       return;
     }
@@ -184,7 +184,8 @@ wss.on('connection', (ws, req) => {
       client.room.create(variable, value);
     }
 
-    // Generate the send message only when a client will actually hear it.
+    persistence.save(rooms.rooms); 
+
     const clients = client.room.getClients();
     if (clients.length > 1) {
       const message = createSetMessage(variable, value);

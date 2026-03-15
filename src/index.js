@@ -44,3 +44,16 @@ server.listen(port, function() {
   }
   logger.info('Server started on port: ' + port);
 });
+
+// ADD at the bottom of index.js
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, saving and shutting down');
+  wss.close();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT received, saving and shutting down');
+  wss.close();
+  process.exit(0);
+});
