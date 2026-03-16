@@ -45,7 +45,6 @@ server.listen(port, function() {
   logger.info('Server started on port: ' + port);
 });
 
-// ADD at the bottom of index.js
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received, saving and shutting down');
   wss.close();
@@ -56,4 +55,13 @@ process.on('SIGINT', () => {
   logger.info('SIGINT received, saving and shutting down');
   wss.close();
   process.exit(0);
+});
+
+server.on('request', function(req, res) {
+    if (req.url === '/debug-rooms') {
+        const rooms = require('./server').getRooms();
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(rooms, null, 2));
+        return;
+    }
 });

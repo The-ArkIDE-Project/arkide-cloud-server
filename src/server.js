@@ -272,4 +272,29 @@ wss.on('close', () => {
   rooms.destroy();
 });
 
+const getRooms = () => {
+    const data = {};
+    for (const [id, room] of rooms.rooms.entries()) {
+        const vars = {};
+        room.getAllVariables().forEach((value, name) => {
+            vars[name] = value;
+        });
+        data[id] = vars;
+    }
+    return data;
+};
+
+module.exports.getRooms = getRooms;
+
 module.exports = wss;
+module.exports.getRooms = () => {
+    const data = {};
+    for (const [id, room] of rooms.rooms.entries()) {
+        const vars = {};
+        room.getAllVariables().forEach((value, name) => {
+            vars[name] = value;
+        });
+        data[id] = vars;
+    }
+    return data;
+};

@@ -31,6 +31,7 @@ function save(rooms) {
         data[id] = vars;
       }
     }
+    console.log('Saving rooms:', JSON.stringify(data, null, 2));
     fs.writeFileSync(SAVE_FILE, JSON.stringify(data, null, 2));
   } catch (e) {
     console.error('Failed to persist cloud vars:', e);
