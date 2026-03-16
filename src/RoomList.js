@@ -154,6 +154,9 @@ class RoomList {
     }
     persistence.save(this.rooms);
   }
+  getRooms() {
+      return this.rooms;
+  }
 }
 
 module.exports = RoomList;

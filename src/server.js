@@ -184,7 +184,7 @@ wss.on('connection', (ws, req) => {
       client.room.create(variable, value);
     }
 
-    persistence.save(rooms.rooms); 
+    persistence.save(rooms.getRooms());
 
     const clients = client.room.getClients();
     if (clients.length > 1) {
